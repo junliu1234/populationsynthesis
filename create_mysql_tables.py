@@ -88,6 +88,10 @@ def create_tables(db, project_name):
 if __name__ == '__main__':
 	db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'test')
 	
+# How to pickup the location of the flat-files, this can probably come from the GUI?
 	create_tables (db, 'NCPopSyn')
-	
+
+
+
+
 	db.close()
