@@ -281,13 +281,5 @@ if __name__ == '__main__':
 #        job_server.print_stats()
         print ' Total time for puma - %.2f, Timing per geography - %.2f' %(time.clock()-start, (time.clock()-start)/len(blockgroups))
 
-
-
-
     dbc.close()
     db.close()
-
-
-
-
-
