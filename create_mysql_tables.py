@@ -1,6 +1,6 @@
 import MySQLdb
 
-def create_tables(db, project_name):
+def create_tables(db, project_name, path):
 	
 	dbc = db.cursor()
 	print ('Create Database %s' %(project_name))
@@ -17,6 +17,7 @@ def create_tables(db, project_name):
 							     hhldtype int,
 							     hhldsize int,
 							     hhldinc int)''')
+	dbc.execute('''load data local infile '%s/hhld_pums.dat' into table hhld_pums'''%(path))
 	
 	dbc.execute(''' Create Table person_pums(pumano int,
 								 hhldpumsid int,
@@ -26,7 +27,8 @@ def create_tables(db, project_name):
 								 age int, 
 								 race int, 
 								 employment int)''')
-	
+	dbc.execute('''load data local infile '%s/person_pums.dat' into table person_pums''' %(path))
+
 	dbc.execute('''Create Table hhld_marginals(county int,
 								  pumano int,
 								  tract int,
@@ -54,6 +56,7 @@ def create_tables(db, project_name):
 								  hhldinc6 int,
 								  hhldinc7 int,
 								  hhldinc8 int)''')
+	dbc.execute('''load data local infile '%s/hhld_sf_marginals.dat' into table hhld_marginals'''%(path))
 
 	dbc.execute(''' Create Table person_marginals(county int,
 								       pumano int,
@@ -82,14 +85,17 @@ def create_tables(db, project_name):
 								       employment2 int,
 								       employment3 int,
 								       employment4 int)''')
+	dbc.execute('''load data local infile '%s/person_sf_marginals.dat' into table person_marginals'''%(path))
 	dbc.close()
+	db.commit()
 	db.close()
 
 if __name__ == '__main__':
 	db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'test')
 	
 # How to pickup the location of the flat-files, this can probably come from the GUI?
-	create_tables (db, 'NCPopSyn')
+	path = 'c:/populationsynthesis/northcarolina/data'
+	create_tables (db, 'NCTest', path)
 
 
 
