@@ -246,10 +246,10 @@ if __name__ == '__main__':
 
 # This is the serial implementation of the code
 #    NC sample geographies
-    geography = [(2900,20100,5)]
+#    geography = [(2900,20100,5)]
 #    geography = [(106,217202,1), (106,217202,2)]
 #    configure_and_run(index_matrix, p_index_matrix, geography[0])
-    print 'Synthesis for %d geographies completed in %.2f' %(len(geography),time.clock()-ti)
+#    print 'Synthesis for %d geographies completed in %.2f' %(len(geography),time.clock()-ti)
 
 # This is the parallel implementation of the code
 # Initiating the server and starting the parallelizing process
@@ -262,7 +262,7 @@ if __name__ == '__main__':
     dbc.execute('select pumano from hhld_marginals where pumano <>0 group by pumano')
     pumas = numpy.asarray(dbc.fetchall())
     print pumas
-    pumas = [[2400]]
+   
     for i in pumas:
         dbc.execute('''select pumano, tract, bg from hhld_marginals where 
 				pumano = %s and hhldtotal <> 0''' %(i[0]))
@@ -272,13 +272,13 @@ if __name__ == '__main__':
 
         modules = ('heuristic_algorithm','psuedo_sparse_matrix','drawing_households','adjusting_pums_joint_distribution','scipy','numpy','pylab','MySQLdb','time','scipy.stats')
         print 'Using %d cores on the processor' %(job_server.get_ncpus())
-#        jobs = [(input, job_server.submit(configure_and_run, (index_matrix,
-#                                                          p_index_matrix,
-#                                                         input), (), modules)) for input in blockgroups]
+        jobs = [(input, job_server.submit(configure_and_run, (index_matrix,
+                                                          p_index_matrix,
+                                                         input), (), modules)) for input in blockgroups]
     
-#        for input, job in jobs:
-#            print job()
-#        job_server.print_stats()
+        for input, job in jobs:
+            print job()
+        job_server.print_stats()
         print ' Total time for puma - %.2f, Timing per geography - %.2f' %(time.clock()-start, (time.clock()-start)/len(blockgroups))
 
     dbc.close()
