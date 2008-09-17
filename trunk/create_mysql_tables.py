@@ -95,7 +95,7 @@ if __name__ == '__main__':
 	
 # How to pickup the location of the flat-files, this can probably come from the GUI?
 	path = 'c:/populationsynthesis/northcarolina/data'
-	create_tables (db, 'NCTest', path)
+	create_tables (db, 'ncpopsyn', path)
 
 
 
