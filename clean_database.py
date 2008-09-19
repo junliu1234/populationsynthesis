@@ -19,9 +19,8 @@ def clean_database(db):
 
 def check_table(name):
        
-    if name == 'hhld_marginals' or name == 'hhld_pums' or name == 'person_marginals' or \
-        name == 'person_pums' or name == 'hhld_puma_marginals' or name == 'person_puma_marginals' \
-        or name =='sparse_matrix_0' or name == 'sparse_matrix1_0' or name =='hhld_synthetic_data' or name =='person_synthetic_data':
+    if name == 'housing_marginals' or name == 'hhld_pums' or name == 'person_marginals' or \
+        name == 'person_pums' or name == 'housing_pums' or name =='gq_pums':
         return 0
     else:
         return 1
@@ -32,7 +31,7 @@ if __name__ == '__main__':
     ti = time.clock()
     print "start - ",ti
 
-    db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'popsyntest')
+    db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'ncpopsynnew')
     
     clean_database(db)
    

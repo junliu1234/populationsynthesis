@@ -59,40 +59,5 @@ class database:
         return r
 
 if __name__ == '__main__':
-    db = MySQLdb.connect(user = 'root', passwd = 'mashima', db = 'popsyn')
-    person = database(db, 'person_pums')
+    pass
     
-    hhld = database(db, 'hhld_pums')
-
-    print hhld.variables()
-
-
-# Accessing the variables in the household file
-    hhld.vardescription()
-    result = hhld.dbc.fetchall()
-    hhld_var_desc = []    
-    for dummy in result:
-        hhld_var_desc.append(list(dummy))
-    print arr(hhld_var_desc)
-
-# Accessing the number of unique categories in each of the control variables for household file
-    for dummy in range(len(hhld_var_desc)):
-        hhld.categories(hhld_var_desc[dummy][0])
-        result = hhld.dbc.rowcount        
-        print result
-
-# Accessing the variables in the person file
-    person.vardescription()
-    result = person.dbc.fetchall()
-    person_var_desc = []    
-    for dummy in result:
-        person_var_desc.append(list(dummy))
-    print arr(person_var_desc)
-
-# Accessing the number of unique categories in each of the control variables for person file
-    for dummy in range(len(person_var_desc)):
-        person.categories(person_var_desc[dummy][0])
-        result = person.dbc.rowcount        
-        print result
-
-
