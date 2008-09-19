@@ -12,37 +12,46 @@ from scipy import sparse
 from scipy import poly1d
 import adjusting_pums_joint_distribution as adjusting_pums_joint_distribution
 
-
-def populate_master_matrix(db, pumano, sample_size, hhld_dimensions, person_dimensions):
-
-# In the first part we create the matrix
+def populate_master_matrix(db, pumano, sample_size, hhld_dimensions, gq_dimensions, person_dimensions):
+# First we create an empty matrix based on the dimensions of the hhhld, gq, and person control variables
     hhld_types = arr(hhld_dimensions).prod()
+    gq_types = arr(gq_dimensions).prod()
     person_types = arr(person_dimensions).prod()
 
    
-# We add 2 more columns to accomodate puma id, and hhld pums id. Also note that the matrix indices start from 0
-# Structure of sample_matrix - puma id (0 th column), hhld pums id, hhld types, person types, wts from the entropy procedure
-    total_cols = 2 + hhld_types + person_types 
-   
+# We add 2 more columns to also store the puma id, and housing pums id. Also note that the matrix indices start from 0
+# Layout of the master matrix is as follows - puma id (0 th column), housing pums id, hhld types frequency, 
+# gq types frequency, person types frequency
+    total_cols = 2 + hhld_types + gq_types + person_types
     matrix = sparse.lil_matrix((sample_size, total_cols))
     
 # In this part we populate the matrix
     dbc = db.cursor()
-    for control_type in ['hhld', 'person']:
-        if control_type == 'hhld':
+
+    for control_type in ['hhld', 'gq', 'person']:
+# Here we determine the starting column in the master matrix for the hhld types, gq types and person types frequency within each home
+	if control_type == 'hhld':
             start = 1
+        elif control_type == 'gq':
+	    start = 1 + arr(hhld_dimensions).prod()
         else:
-            start = 1 + arr(hhld_dimensions).prod()
+            start = 1 + arr(hhld_dimensions).prod() + arr(gq_dimensions).prod()
+
+# Read the pums data from the mysql files to 
         if pumano == 0:
             dbc.execute('Select * from %s_pums' %(control_type))
         else:
             dbc.execute('Select * from %s_pums where pumano = %s' %(control_type, pumano))
         result = arr(dbc.fetchall())
-        if control_type == 'hhld':
+
+# Master Matrix is populated here
+        if control_type == 'hhld' or control_type == 'gq':
             rows = 0
             for i in result[:,2]:
+# Storing the pumano, housing puma id for all housing units
                 matrix[i - 1,:2] = result[rows,:2]
                 rows = rows + 1
+# Populating the household type, gq type, person type frequencies 
 	for i in range(dbc.rowcount):
 	    matrix[result[i, 2]-1, start+result[i, -1]] = matrix[result[i, 2]-1, start+result[i, -1]] + 1
     dbc.close()
@@ -50,6 +59,7 @@ def populate_master_matrix(db, pumano, sample_size, hhld_dimensions, person_dime
 
 
 def psuedo_sparse_matrix(db, matrix, pumano):
+# Sprase representation of the psuedo matrix
     sparse_matrix = []
     dummy = []
     rows = 0
@@ -78,16 +88,18 @@ def psuedo_sparse_matrix(db, matrix, pumano):
     
     dbc = db.cursor()
     try:
-        dbc.execute('create table sparse_matrix_%s(hhldpumsid bigint, rowno mediumint, colno mediumint, freq mediumint);'%(pumano))
+        dbc.execute('create table sparse_matrix_%s(hhpumsid bigint, rowno mediumint, colno mediumint, freq mediumint);'%(pumano))
         dbc.execute("load data local infile '%s' into table sparse_matrix_%s" %(path, pumano))
     except:
         dbc.execute('drop table sparse_matrix_%s'%(pumano))
-        dbc.execute('create table sparse_matrix_%s(hhldpumsid bigint, rowno mediumint, colno mediumint, freq mediumint);'%(pumano))
+        dbc.execute('create table sparse_matrix_%s(hhpumsid bigint, rowno mediumint, colno mediumint, freq mediumint);'%(pumano))
         dbc.execute("load data local infile '%s' into table sparse_matrix_%s" %(path, pumano))
+    os.remove(dummy.txt)
     dbc.close()
     return arr(sparse_matrix)
 
 def generate_index_matrix(db, pumano):
+# Creating an index matrix that stores the row numbers for each constraint
     dbc = db.cursor()
     try:
         dbc.execute("drop table sparse_matrix1_%s"%(pumano))
