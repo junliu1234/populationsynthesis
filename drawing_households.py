@@ -67,15 +67,15 @@ def create_whole_frequencies(db, synthesis_type, order_string, pumano = 0, tract
     if diff_total < 0:
         dbc.execute('select %suniqueid from %s where r_marginal <>0 and tract = %s and bg = %s order by diff_marginals '%(synthesis_type, table_name, tract, bg))
     else:
-        dbc.execute('select %suniqueid from %s where marginal <>0 and tract = %s and bg = %s order by diff_marginals desc'%(synthesis_type, table_name, tract, bg))
+        dbc.execute('select %suniqueid from %s where r_marginal <>0 and tract = %s and bg = %s order by diff_marginals desc'%(synthesis_type, table_name, tract, bg))
     result = dbc.fetchall()
 
 #    print 'The marginals corresponding to the following hhldtypes were changed by the given amount'
 
     for i in range(int(abs(diff_total))):
 #        print 'record - %s changed by %s' %(result[i][0], diff_total / abs(diff_total))
-        dbc.execute('update %s set r_marginal = r_marginal + %s where %suniqueid = %s and r_marginal <> 0 and tract = %s and bg = %s' %(table_name, diff_total / abs(diff_total), synthesis_type, result[i][0], tract, bg))
-
+        dbc.execute('update %s set r_marginal = r_marginal + %s where %suniqueid = %s and tract = %s and bg = %s' %(table_name, diff_total / abs(diff_total), synthesis_type, result[i][0], tract, bg))
+        
     dbc.execute('select r_marginal from %s where marginal <> 0 and tract = %s and bg = %s order by %suniqueid'%(table_name, tract, bg, synthesis_type))
     marginals = arr(dbc.fetchall())
     dbc.close()
