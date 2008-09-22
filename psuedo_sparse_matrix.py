@@ -94,7 +94,7 @@ def psuedo_sparse_matrix(db, matrix, pumano):
         dbc.execute('drop table sparse_matrix_%s'%(pumano))
         dbc.execute('create table sparse_matrix_%s(hhpumsid bigint, rowno mediumint, colno mediumint, freq mediumint);'%(pumano))
         dbc.execute("load data local infile '%s' into table sparse_matrix_%s" %(path, pumano))
-    os.remove(dummy.txt)
+    os.remove('dummy.txt')
     dbc.close()
     return arr(sparse_matrix)
 
