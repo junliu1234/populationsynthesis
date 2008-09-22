@@ -97,7 +97,7 @@ def drawing_housing_units(db, frequencies, weights, index_matrix, sp_matrix, pum
     j = 0
     for i in index_matrix[:hh_colno,:]:
         if i[1] == i[2] and frequencies[j]>0:
-            synthetic_population.append([sp_matrix[i[1]-1, 2] + 1, frequencies[j]], i[0])
+            synthetic_population.append([sp_matrix[i[1]-1, 2] + 1, frequencies[j], i[0]])
             print 'hhid single',sp_matrix[i[1]-1, 2]
         else:
             cumulative_weights = weights[sp_matrix[i[1]-1:i[2], 2]].cumsum()
