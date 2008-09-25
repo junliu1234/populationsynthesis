@@ -37,6 +37,8 @@ def create_whole_frequencies(db, synthesis_type, order_string, pumano = 0, tract
     dbc = db.cursor()
     table_name = ('%s_%s_ipf'%(synthesis_type, pumano))
 
+    
+
     try:
         dbc.execute('create table %s select pumano, tract, bg, frequency from hhld_%s_joint_dist where 0;' %(table_name, pumano))
         dbc.execute('alter table %s change frequency marginal float'%(table_name))
@@ -67,7 +69,7 @@ def create_whole_frequencies(db, synthesis_type, order_string, pumano = 0, tract
     if diff_total < 0:
         dbc.execute('select %suniqueid from %s where r_marginal <>0 and tract = %s and bg = %s order by diff_marginals '%(synthesis_type, table_name, tract, bg))
     else:
-        dbc.execute('select %suniqueid from %s where r_marginal <>0 and tract = %s and bg = %s order by diff_marginals desc'%(synthesis_type, table_name, tract, bg))
+        dbc.execute('select %suniqueid from %s where marginal <>0 and tract = %s and bg = %s order by diff_marginals desc'%(synthesis_type, table_name, tract, bg))
     result = dbc.fetchall()
 
 #    print 'The marginals corresponding to the following hhldtypes were changed by the given amount'
