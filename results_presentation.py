@@ -3,6 +3,11 @@ import numpy
 
 
 def display_results(db, pumano, tract, bg):
+    print '------------------------------------------------------------------'
+    print 'Geography: PUMA ID- %s, Tract ID- %0.2f, BG ID- %s' \
+                                                                         %(pumano, float(tract)/100, bg)
+    print '------------------------------------------------------------------'
+
     dbc = db.cursor()
     hh_variables = ['childpresence', 'hhldtype', 'hhldsize', 'hhldinc', 'groupquarter']
     hh_dimensions = [2, 5, 7, 8, 2]
@@ -63,10 +68,9 @@ if __name__ == '__main__':
     db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'ncpopsynnew')
     dbc = db.cursor()
     
-    display_results(db, 3300, 970700, 1)
-#    display_results(db, 3300, 970700, 2)
-#    display_results(db, 3300, 970700, 3)
-#    display_results(db, 3300, 970700, 4)
-#    display_results(db, 3300, 970700, 5)
-#    display_results(db, 3300, 970700, 6)
+    display_results(db, 2701, 53600, 3)
+    display_results(db, 2702, 52805, 2)
+    display_results(db, 2702, 53403, 3)
+    display_results(db, 2601, 51100, 2)
+    display_results(db, 2601, 52302, 1)
     dbc.close()
