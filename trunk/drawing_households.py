@@ -6,8 +6,6 @@ import time
 import os
 from numpy import asarray as arr
 from numpy import random, histogram, zeros, arange
-from ipf_mysql import create_aggregation_string
-from ipf_mysql import choose_control_variables
 
 def person_index_matrix(db, pumano = 0):
     dbc = db.cursor()
