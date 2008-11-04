@@ -31,7 +31,7 @@ if __name__ == '__main__':
     ti = time.clock()
     print "start - ",ti
 
-    db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'ncpopsynnew')
+    db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'ncpopsyn')
     
     clean_database(db)
    
