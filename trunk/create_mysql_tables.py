@@ -26,18 +26,18 @@ def create_tables(db, project_name, path):
 	dbc.execute('''Create Table housing_marginals ( county int, pumano int,
 								         tract int, bg int,
 								         hhtotal int, childpresence1 int,
-									 childpresence2 int, hhldtype1 int,
-									 hhldtype2 int, hhldtype3 int,
-									  hhldtype4 int, hhldtype5 int,
-									 hhldsize1 int, hhldsize2 int,
-									 hhldsize3 int, hhldsize4 int,
-									 hhldsize5 int, hhldsize6 int,
-									 hhldsize7 int, hhldinc1 int,
-									 hhldinc2 int, hhldinc3 int,
-									 hhldinc4 int, hhldinc5 int,
-									 hhldinc6 int, hhldinc7 int,
-									 hhldinc8 int, groupquarter1 int, 
-									 groupquarter2 int )''')
+								         childpresence2 int, hhldtype1 int,
+								         hhldtype2 int, hhldtype3 int,
+								         hhldtype4 int, hhldtype5 int,
+								         hhldsize1 int, hhldsize2 int,
+								         hhldsize3 int, hhldsize4 int,
+								         hhldsize5 int, hhldsize6 int,
+								         hhldsize7 int, hhldinc1 int,
+								         hhldinc2 int, hhldinc3 int,
+								         hhldinc4 int, hhldinc5 int,
+								         hhldinc6 int, hhldinc7 int,
+								         hhldinc8 int, groupquarter1 int, 
+								         groupquarter2 int )''')
 	dbc.execute('''load data local infile '%s/housing_marginals.dat' into table housing_marginals'''%(path))
 
 	dbc.execute('''Create Table person_marginals ( county int, pumano int,
@@ -66,13 +66,8 @@ def create_tables(db, project_name, path):
 	db.close()
 
 if __name__ == '__main__':
-	db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'test')
-	
+	db = MySQLdb.connect(user = 'root', passwd = '1234')
 # How to pickup the location of the flat-files, this can probably come from the GUI?
 	path = 'c:/populationsynthesis/northcarolinanew/data'
 	create_tables (db, 'ncpopsynnew', path)
-
-
-
-
 	db.close()
