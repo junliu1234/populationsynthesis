@@ -152,8 +152,8 @@ def configure_and_run(index_matrix, p_index_matrix, geoid):
             max_p_person_attributes = synthetic_person_attributes
             min_chi = stat
 
-    numpy.set_printoptions(precision = 0, suppress = True)
-    print numpy.hstack((person_objective_frequency, person_estimated_frequency))
+#    numpy.set_printoptions(precision = 0, suppress = True)
+#    print numpy.hstack((person_objective_frequency, person_estimated_frequency))
 
     if draw_count >=25:
         print 'Max Iterations reached for drawing households with the best draw having a p-value of %.4f' %(max_p)
@@ -277,7 +277,7 @@ if __name__ == '__main__':
         dbc.execute('''select pumano, tract, bg from housing_marginals where 
                            pumano = %s and hhtotal <> 0''' %(i[0]))
         blockgroups = list(dbc.fetchall())
-        blockgroups = [(3300, 970700, 1)]
+        blockgroups = [(2802, 801, 1)]
         print 'Number of blockgroups in PUMA - %s is %s'%(i[0], len(blockgroups))
         modules = ('heuristic_algorithm','psuedo_sparse_matrix',
                         'drawing_households','adjusting_pums_joint_distribution',
