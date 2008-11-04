@@ -65,12 +65,8 @@ def display_results(db, pumano, tract, bg):
 if __name__ == '__main__':
 
 
-    db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'ncpopsynnew')
+    db = MySQLdb.connect(user = 'root', passwd = '1234', db = 'ncpopsyn')
     dbc = db.cursor()
     
-    display_results(db, 2701, 53600, 3)
-    display_results(db, 2702, 52805, 2)
-    display_results(db, 2702, 53403, 3)
-    display_results(db, 2601, 51100, 2)
-    display_results(db, 2601, 52302, 1)
+    display_results(db, 2702, 52900, 4)
     dbc.close()
