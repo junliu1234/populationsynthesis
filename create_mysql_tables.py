@@ -69,5 +69,5 @@ if __name__ == '__main__':
 	db = MySQLdb.connect(user = 'root', passwd = '1234')
 # How to pickup the location of the flat-files, this can probably come from the GUI?
 	path = 'c:/populationsynthesis/northcarolinanew/data'
-	create_tables (db, 'ncpopsynnew', path)
+	create_tables (db, 'ncpopsyn', path)
 	db.close()
