@@ -40,6 +40,7 @@ def create_whole_frequencies(db, synthesis_type, order_string, pumano = 0, tract
     try:
         dbc.execute('create table %s select pumano, tract, bg, frequency from hhld_%s_joint_dist where 0;' %(table_name, pumano))
         dbc.execute('alter table %s change frequency marginal float'%(table_name))
+        dbc.execute('alter table %s add prior int default 0' %(table_name))
         dbc.execute('alter table %s add r_marginal int default 0'%(table_name))
         dbc.execute('alter table %s add diff_marginals float default 0'%(table_name))
         dbc.execute('alter table %s add %suniqueid int'%(table_name, synthesis_type))
@@ -47,16 +48,21 @@ def create_whole_frequencies(db, synthesis_type, order_string, pumano = 0, tract
     except:
         pass
     dbc.execute('select frequency from %s_%s_joint_dist where tract = %s and bg = %s order by %s;' %(synthesis_type, pumano, tract, bg, order_string))
-    result = arr(dbc.fetchall())
+    frequency = arr(dbc.fetchall())
+
+    dbc.execute('select frequency from %s_0_joint_dist order by %s' %(synthesis_type, order_string))
+    prior = arr(dbc.fetchall())
+    
     rowcount = dbc.rowcount
-    dummy_table = zeros((rowcount, 5))
-    dummy_table[:,:-2] = [pumano, tract, bg]
-    dummy_table[:,-2] = result[:,0]
+    dummy_table = zeros((rowcount, 6))
+    dummy_table[:,:-3] = [pumano, tract, bg]
+    dummy_table[:,-3] = frequency[:,0]
+    dummy_table[:,-2] = prior[:,0]
     dummy_table[:,-1] = (arange(rowcount)+1)
 
     dbc.execute('delete from %s where tract = %s and bg = %s' %(table_name, tract, bg))
     dummy_table = str([tuple(i) for i in dummy_table])
-    dbc.execute('insert into %s (pumano, tract, bg, marginal, %suniqueid) values %s;' %(table_name, synthesis_type, dummy_table[1:-1]))
+    dbc.execute('insert into %s (pumano, tract, bg, marginal, prior, %suniqueid) values %s;' %(table_name, synthesis_type, dummy_table[1:-1]))
     dbc.execute('update %s set r_marginal = marginal where tract = %s and bg = %s'%(table_name, tract, bg))
     dbc.execute('update %s set diff_marginals = (marginal - r_marginal) * marginal where tract = %s and bg = %s'%(table_name, tract, bg))
     dbc.execute('select sum(marginal) - sum(r_marginal) from %s where tract = %s and bg = %s'%(table_name, tract, bg))
@@ -76,7 +82,7 @@ def create_whole_frequencies(db, synthesis_type, order_string, pumano = 0, tract
 #        print 'record - %s changed by %s' %(result[i][0], diff_total / abs(diff_total))
         dbc.execute('update %s set r_marginal = r_marginal + %s where %suniqueid = %s and tract = %s and bg = %s' %(table_name, diff_total / abs(diff_total), synthesis_type, result[i][0], tract, bg))
         
-    dbc.execute('select r_marginal from %s where marginal <> 0 and tract = %s and bg = %s order by %suniqueid'%(table_name, tract, bg, synthesis_type))
+    dbc.execute('select r_marginal from %s where prior <> 0 and tract = %s and bg = %s order by %suniqueid'%(table_name, tract, bg, synthesis_type))
     marginals = arr(dbc.fetchall())
     dbc.close()
     db.commit()
@@ -98,7 +104,6 @@ def drawing_housing_units(db, frequencies, weights, index_matrix, sp_matrix, pum
     for i in index_matrix[:hh_colno,:]:
         if i[1] == i[2] and frequencies[j]>0:
             synthetic_population.append([sp_matrix[i[1]-1, 2] + 1, frequencies[j], i[0]])
-            print 'hhid single',sp_matrix[i[1]-1, 2]
         else:
             cumulative_weights = weights[sp_matrix[i[1]-1:i[2], 2]].cumsum()
             probability_distribution = cumulative_weights / cumulative_weights[-1]
