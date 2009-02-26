@@ -5,10 +5,38 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
 import qrc_resources
-from file_menu.test_new import Wizard
+from file_menu.test_new2 import Wizard
+from file_menu.process_raw_data import PrepareData, PopulateFileManager
+from file_menu.import_data import autoProcessPUMSData
 
 
 qgis_prefix = "C:\qgis\Quantum GIS"
+
+class QTreeWidgetCMenu(QTreeWidget):
+    def __init__(self, parent = None):
+        super(QTreeWidgetCMenu, self).__init__(parent)
+
+        
+       
+    def contextMenuEvent(self, event):
+        menu = QMenu(self)
+        importDataAction = menu.addAction("&Import Data")
+        self.connect(importDataAction, SIGNAL("triggered()"), self.importData)
+        if self.item.parent() is None:
+            menu.exec_(event.globalPos())
+
+    def click(self, item, column):
+        self.item = item
+        
+        
+    def editItem(self, item, column):
+        self.item = item
+        if self.item.parent() is not None:
+            self.openPersistentEditor(self.item, 1)
+
+    def importData(self):
+        QMessageBox.information(None, "Check", "Import Data", QMessageBox.Ok)
+        
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -17,8 +45,12 @@ class MainWindow(QMainWindow):
         self.dirty = False
         self.projectName = None
 
+        
+        self.setWindowTitle("HIPGen Version-0.50")
+        self.setWindowIcon(QIcon("./images/popsyn.png"))
         self.workingWindow = QLabel()
-        self.workingWindow.setMinimumSize(600,600)
+        self.showMaximized()
+        self.setMinimumSize(800,500)
         self.workingWindow.setAlignment(Qt.AlignCenter)
         self.setCentralWidget(self.workingWindow)
         
@@ -80,6 +112,7 @@ class MainWindow(QMainWindow):
                                                        tip="Define the different parameter values.")
         synthesizerRunAction = self.createAction("Run", self.synthesizerRun, 
                                                icon="run", tip="Run the populaiton synthesis.")
+        synthesizerRunAction.setEnabled(False)
         synthesizerStopAction = self.createAction("Stop", self.synthesizerStop, 
                                                    icon="stop", tip="Stop the current population synthesis run.")
 # Adding actions to menu
@@ -147,28 +180,42 @@ class MainWindow(QMainWindow):
         fileManagerDockWidget.setObjectName("FileManagerDockWidget")
         fileManagerDockWidget.setAllowedAreas(Qt.LeftDockWidgetArea)
 
-        self.fileManager = QTreeWidget()        
+        self.fileManager = QTreeWidgetCMenu()
+        self.fileManager.setMinimumSize(250, 400)
         self.fileManager.setColumnCount(2)
-        self.fileManager.setHeaderLabels(["Database/Table/Variable", "Source"])
+        self.fileManager.setHeaderLabels(["Name", "Value"])
         self.fileManager.setItemsExpandable(True)
         fileManagerDockWidget.setWidget(self.fileManager)
         self.addDockWidget(Qt.LeftDockWidgetArea, fileManagerDockWidget)
         
-        ancestor = QTreeWidgetItem(self.fileManager, [QString('database'), QString('c:\location')])
-        parent = QTreeWidgetItem(ancestor, [QString('Tables')])
-        QTreeWidgetItem(parent, [QString('Variables')])
+        ancestor = QTreeWidgetItem(self.fileManager, [QString("<Database>"), QString("<location>")])
+        parent = QTreeWidgetItem(ancestor, [QString("<Tables>")])
+        QTreeWidgetItem(parent, [QString("<Variables>")])
         self.fileManager.expandItem(parent)
         self.fileManager.expandItem(ancestor)
+        self.fileManager.setEnabled(False)
         
+        self.connect(self.fileManager, SIGNAL("itemDoubleClicked(QTreeWidgetItem *,int)"), self.fileManager.editItem)
+        self.connect(self.fileManager, SIGNAL("itemClicked(QTreeWidgetItem *,int)"), self.fileManager.click)
+
+
 
 # Defining all the slots and supporting methods
 
     def projectNew(self):
         #QMessageBox.information(self, "Information", "Create new project", QMessageBox.Ok)
         wizard = Wizard()
-        #wizard.show()
+        wizard.setWindowIcon(QIcon("./images/projectnew.png"))
+
         if wizard.exec_():
-            print "dialog"
+            print "complete"
+            PopulateFileManager(wizard.project, self.fileManager)
+            if wizard.project.sampleUserProv.userProv:
+                autoProcessPUMSData(wizard.project)
+            #PrepareData(wizard.project)
+        else:
+            print "working"
+
 
 
     def projectOpen(self):
@@ -239,7 +286,7 @@ class MainWindow(QMainWindow):
                      tip=None, checkable=False, signal="triggered()"):
         action = QAction(text, self)
         if icon is not None:
-            action.setIcon(QIcon("images/%s.png" % icon))
+            action.setIcon(QIcon("./images/%s.png" % icon))
         if shortcut is not None:
             action.setShortcut(shortcut)
         if tip is not None:
@@ -268,4 +315,6 @@ def main():
     form.show()
     app.exec_()
 
-main()
+
+if __name__=="__main__":
+    main()
